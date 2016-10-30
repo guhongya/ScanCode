@@ -119,6 +119,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   private InactivityTimer inactivityTimer;
   private BeepManager beepManager;
   private AmbientLightManager ambientLightManager;
+  private View laser;
 
   ViewfinderView getViewfinderView() {
     return viewfinderView;
@@ -266,22 +267,26 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     } else {
       // Install the callback and wait for surfaceCreated() to init the camera.
       surfaceHolder.addCallback(this);
+      //addLaster();
     }
 
   }
   private void addLaster(){
-    View laser=new View(this);
-    laser.setBackgroundColor(Color.RED);
-    Rect rectF=cameraManager.getFramingRect();
-    LinearLayout.LayoutParams layoutParams=new LinearLayout.LayoutParams(cameraManager.getFramingRect().width(),3);
-    this.addContentView(laser,layoutParams);
-    //laser.animate().rotationXBy()
-    TranslateAnimation animation = new TranslateAnimation(Animation.ABSOLUTE,rectF.left , Animation.ABSOLUTE, rectF.left, Animation.ABSOLUTE, rectF.top, Animation.ABSOLUTE,
-            rectF.bottom);
-    animation.setDuration(4500);
-    animation.setRepeatCount(-1);
-    animation.setRepeatMode(Animation.RESTART);
-    laser.startAnimation(animation);
+    if(laser==null) {
+      laser = new View(this);
+      //laser.setBackgroundColor(Color.RED);
+      laser.setBackgroundResource(R.drawable.laster);
+      Rect rectF = cameraManager.getFramingRect();
+      LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(cameraManager.getFramingRect().width(), 3);
+      this.addContentView(laser, layoutParams);
+      //laser.animate().rotationXBy()
+      TranslateAnimation animation = new TranslateAnimation(Animation.ABSOLUTE, rectF.left, Animation.ABSOLUTE, rectF.left, Animation.ABSOLUTE, rectF.top, Animation.ABSOLUTE,
+              rectF.bottom);
+      animation.setDuration(4500);
+      animation.setRepeatCount(-1);
+      animation.setRepeatMode(Animation.RESTART);
+      laser.startAnimation(animation);
+    }
   }
   private int getCurrentOrientation() {
     int rotation = getWindowManager().getDefaultDisplay().getRotation();
