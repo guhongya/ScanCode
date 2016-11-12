@@ -31,10 +31,10 @@ import com.google.zxing.Result;
 import com.google.zxing.client.result.ParsedResult;
 import com.google.zxing.client.result.ParsedResultType;
 import com.google.zxing.client.result.ResultParser;
+import com.gu.zxing.Const;
 import com.gu.zxing.Contents;
 import com.gu.zxing.Intents;
 import com.gu.zxing.LocaleManager;
-import com.gu.zxing.PreferencesActivity;
 import com.gu.zxing.R;
 
 import java.io.UnsupportedEncodingException;
@@ -478,7 +478,7 @@ public abstract class ResultHandler {
 
   private String parseCustomSearchURL() {
     SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
-    String customProductSearch = prefs.getString(PreferencesActivity.KEY_CUSTOM_PRODUCT_SEARCH,
+    String customProductSearch = prefs.getString(Const.KEY_CUSTOM_PRODUCT_SEARCH,
         null);
     if (customProductSearch != null && customProductSearch.trim().isEmpty()) {
       return null;

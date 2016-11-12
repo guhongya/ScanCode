@@ -62,11 +62,9 @@ import com.google.zxing.ResultMetadataType;
 import com.google.zxing.ResultPoint;
 import com.gu.zxing.camera.CameraManager;
 import com.gu.zxing.clipboard.ClipboardInterface;
-import com.gu.zxing.history.HistoryManager;
 import com.gu.zxing.result.ResultButtonListener;
 import com.gu.zxing.result.ResultHandler;
 import com.gu.zxing.result.ResultHandlerFactory;
-import com.gu.zxing.result.supplement.SupplementalInfoRetriever;
 
 import java.io.IOException;
 import java.text.DateFormat;
@@ -92,8 +90,6 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 
   private static final String[] ZXING_URLS = { "http://zxing.appspot.com/scan", "zxing://scan/" };
 
-  public static final int HISTORY_REQUEST_CODE = 0x0000bacc;
-
   private static final Collection<ResultMetadataType> DISPLAYABLE_METADATA_TYPES =
       EnumSet.of(ResultMetadataType.ISSUE_NUMBER,
                  ResultMetadataType.SUGGESTED_PRICE,
@@ -115,7 +111,6 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   private Collection<BarcodeFormat> decodeFormats;
   private Map<DecodeHintType,?> decodeHints;
   private String characterSet;
-  private HistoryManager historyManager;
   private InactivityTimer inactivityTimer;
   private BeepManager beepManager;
   private AmbientLightManager ambientLightManager;
@@ -152,10 +147,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   @Override
   protected void onResume() {
     super.onResume();
-    
-    // historyManager must be initialized here to update the history preference
-    historyManager = new HistoryManager(this);
-    historyManager.trimHistory();
+
 
     // CameraManager must be initialized here, not in onCreate(). This is necessary because we don't
     // want to open the camera driver and measure the screen size if we're going to show the help on
@@ -190,7 +182,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 
     Intent intent = getIntent();
 
-    copyToClipboard = prefs.getBoolean(PreferencesActivity.KEY_COPY_TO_CLIPBOARD, true)
+    copyToClipboard = prefs.getBoolean(Const.KEY_COPY_TO_CLIPBOARD, true)
         && (intent == null || intent.getBooleanExtra(Intents.Scan.SAVE_HISTORY, true));
 
     source = IntentSource.NONE;
@@ -471,7 +463,6 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 
     boolean fromLiveScan = barcode != null;
     if (fromLiveScan) {
-      historyManager.addHistoryItem(rawResult, resultHandler);
       // Then not from history, so beep/vibrate and we have an image to draw on
       beepManager.playBeepSoundAndVibrate();
       drawResultPoints(barcode, scaleFactor, rawResult);
@@ -491,7 +482,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
         break;
       case NONE:
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        if (fromLiveScan && prefs.getBoolean(PreferencesActivity.KEY_BULK_MODE, false)) {
+        if (fromLiveScan && prefs.getBoolean(Const.KEY_BULK_MODE, false)) {
           Toast.makeText(getApplicationContext(),
                          getResources().getString(R.string.msg_bulk_mode_scanned) + " (" + rawResult.getText() + ')',
                          Toast.LENGTH_SHORT).show();
@@ -558,7 +549,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 
     SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
-    if (resultHandler.getDefaultButtonID() != null && prefs.getBoolean(PreferencesActivity.KEY_AUTO_OPEN_WEB, false)) {
+    if (resultHandler.getDefaultButtonID() != null && prefs.getBoolean(Const.KEY_AUTO_OPEN_WEB, false)) {
       resultHandler.handleButtonPress(resultHandler.getDefaultButtonID());
       return;
     }
@@ -615,7 +606,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     supplementTextView.setText("");
     supplementTextView.setOnClickListener(null);
     if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean(
-        PreferencesActivity.KEY_SUPPLEMENTAL, true)) {
+        Const.KEY_SUPPLEMENTAL, true)) {
       //TODO
 //      SupplementalInfoRetriever.maybeInvokeRetrieval(supplementTextView,
 //                                                     resultHandler.getResult(),

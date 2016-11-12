@@ -16,6 +16,7 @@
 
 package com.gu.zxing.camera.open;
 
+import android.annotation.TargetApi;
 import android.hardware.Camera;
 
 /**
@@ -27,16 +28,30 @@ public final class OpenCamera {
   private final Camera camera;
   private final CameraFacing facing;
   private final int orientation;
+  private final android.graphics.Camera camera2;
   
   public OpenCamera(int index, Camera camera, CameraFacing facing, int orientation) {
     this.index = index;
     this.camera = camera;
     this.facing = facing;
     this.orientation = orientation;
+    this.camera2=null;
   }
-
+  @TargetApi(21)
+  public OpenCamera(int index, android.graphics.Camera camera2,CameraFacing facing,int orientation){
+    this.index=index;
+    this.camera2=camera2;
+    this.facing=facing;
+    this.orientation=orientation;
+    this.camera=null;
+  }
   public Camera getCamera() {
     return camera;
+  }
+
+  @TargetApi(21)
+  public android.graphics.Camera getCamera2(){
+    return camera2;
   }
 
   public CameraFacing getFacing() {
